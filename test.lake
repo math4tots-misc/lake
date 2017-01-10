@@ -1,17 +1,33 @@
+
+-- function call
 def f() {
-  print("Hello world!")
+  return 5 + 5
 }
+assert(f() == 10)
 
-f();
-
-var a = 5;
-
+-- 'var'
+var a = 5
 assert(a == 5)
 print(a)
 
+-- while loop
 var i = 10
 while i < 20 {
   i = i + 1
 }
 assert(i == 20)
-print(i)
+
+-- numeric for loop
+var total = 0
+for i = 1, 10 do
+  total = total + i
+end
+assert(total == 55)
+
+-- generic loop
+var xs = {"abc", "def", "ghi"}
+var x = ""
+for k, v in ipairs(xs) do
+  x = x .. k .. v
+end
+assert(x == "1abc2def3ghi")
