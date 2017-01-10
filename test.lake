@@ -46,7 +46,7 @@ assert(not ('a' != "a"))
 -- if
 if true {
   assert(true)
-} elseif false {
+} elif false {
   assert(false)
 } else {
   assert(false)
@@ -54,7 +54,7 @@ if true {
 
 if false {
   assert(false)
-} elseif true {
+} elif true {
   assert(true)
 } else {
   assert(false)
@@ -62,7 +62,7 @@ if false {
 
 if false {
   assert(false)
-} elseif nil {
+} elif nil {
   assert(false)
 } else {
   assert(true)

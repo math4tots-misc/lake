@@ -586,7 +586,7 @@ static void close_func (LexState *ls) {
 */
 static int block_follow (LexState *ls, int withuntil) {
   switch (ls->t.token) {
-    case TK_ELSE: case TK_ELSEIF:
+    case TK_ELSE: case TK_ELIF:
     case TK_END: case TK_EOS:
     case CLOSE_BRACE:
       return 1;
@@ -1407,7 +1407,7 @@ static void test_then_block (LexState *ls, int *escapelist) {
   leaveblock(fs);
   check_match(ls, CLOSE_BRACE, OPEN_BRACE, ls->linenumber);
   if (ls->t.token == TK_ELSE ||
-      ls->t.token == TK_ELSEIF)  /* followed by 'else'/'elseif'? */
+      ls->t.token == TK_ELIF)  /* followed by 'else'/'elif'? */
     luaK_concat(fs, escapelist, luaK_jump(fs));  /* must jump over it */
   luaK_patchtohere(fs, jf);
 }
@@ -1418,7 +1418,7 @@ static void ifstat (LexState *ls, int line) {
   FuncState *fs = ls->fs;
   int escapelist = NO_JUMP;  /* exit list for finished parts */
   test_then_block(ls, &escapelist);  /* IF cond THEN block */
-  while (ls->t.token == TK_ELSEIF)
+  while (ls->t.token == TK_ELIF)
     test_then_block(ls, &escapelist);  /* ELSEIF cond THEN block */
   if (testnext(ls, TK_ELSE)) {
     checknext(ls, OPEN_BRACE);
