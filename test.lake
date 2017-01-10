@@ -43,4 +43,27 @@ assert(1 != 2)
 assert(not (1 != 1))
 assert(not ('a' != "a"))
 
+-- if
+if true {
+  assert(true)
+} elseif false {
+  assert(false)
+} else {
+  assert(false)
+}
 
+if false {
+  assert(false)
+} elseif true {
+  assert(true)
+} else {
+  assert(false)
+}
+
+if false {
+  assert(false)
+} elseif nil {
+  assert(false)
+} else {
+  assert(true)
+}
