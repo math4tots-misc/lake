@@ -1036,7 +1036,7 @@ static void codecomp (FuncState *fs, BinOpr opr, expdesc *e1, expdesc *e2) {
   int rk2 = luaK_exp2RK(fs, e2);
   freeexps(fs, e1, e2);
   switch (opr) {
-    case OPR_NE: {  /* '(a ~= b)' ==> 'not (a == b)' */
+    case OPR_NE: {  /* '(a != b)' ==> 'not (a == b)' */
       e1->u.info = condjump(fs, OP_EQ, 0, rk1, rk2);
       break;
     }

@@ -35,3 +35,11 @@ assert(x == "1abc2def3ghi")
 xs = [a = 5, *["hello " .. "world"] = 17]
 assert(xs['a'] == 5)
 assert(xs["hello world"] == 17)
+
+-- 'not equals' operator
+-- But C-based languages usually use '!='
+assert(1 != 2)
+assert(not (1 != 1))
+assert(not ('a' != "a"))
+
+

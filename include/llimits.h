@@ -273,7 +273,7 @@ typedef unsigned long Instruction;
 ** modulo: defined as 'a - floor(a/b)*b'; this definition gives NaN when
 ** 'b' is huge, but the result should be 'a'. 'fmod' gives the result of
 ** 'a - trunc(a/b)*b', and therefore must be corrected when 'trunc(a/b)
-** ~= floor(a/b)'. That happens when the division has a non-integer
+** != floor(a/b)'. That happens when the division has a non-integer
 ** negative result, which is equivalent to the test below.
 */
 #if !defined(luai_nummod)
