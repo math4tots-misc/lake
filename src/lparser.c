@@ -586,7 +586,7 @@ static void close_func (LexState *ls) {
 */
 static int block_follow (LexState *ls, int withuntil) {
   switch (ls->t.token) {
-    case TK_ELSE: case TK_ELIF:
+    case TK_ELSE:
     case TK_END: case TK_EOS:
     case CLOSE_BRACE:
       return 1;
@@ -1378,7 +1378,7 @@ static void forstat (LexState *ls, int line) {
 
 
 static void test_then_block (LexState *ls, int *escapelist) {
-  /* test_then_block -> [IF | ELSEIF] cond THEN block */
+  /* test_then_block -> IF cond THEN block */
   BlockCnt bl;
   FuncState *fs = ls->fs;
   expdesc v;
@@ -1406,20 +1406,21 @@ static void test_then_block (LexState *ls, int *escapelist) {
   statlist(ls);  /* 'then' part */
   leaveblock(fs);
   check_match(ls, CLOSE_BRACE, OPEN_BRACE, ls->linenumber);
-  if (ls->t.token == TK_ELSE ||
-      ls->t.token == TK_ELIF)  /* followed by 'else'/'elif'? */
+  if (ls->t.token == TK_ELSE)  /* followed by 'else'/'elif'? */
     luaK_concat(fs, escapelist, luaK_jump(fs));  /* must jump over it */
   luaK_patchtohere(fs, jf);
 }
 
 
 static void ifstat (LexState *ls, int line) {
-  /* ifstat -> IF cond THEN block {ELSEIF cond THEN block} [ELSE block] END */
+  /* ifstat -> IF cond '{' block '}' {ELSE IF cond THEN '{' block '}'} [ELSE '{' block '}'] */
   FuncState *fs = ls->fs;
   int escapelist = NO_JUMP;  /* exit list for finished parts */
-  test_then_block(ls, &escapelist);  /* IF cond THEN block */
-  while (ls->t.token == TK_ELIF)
-    test_then_block(ls, &escapelist);  /* ELSEIF cond THEN block */
+  test_then_block(ls, &escapelist);  /* IF cond '{' block '}' */
+  while (ls->t.token == TK_ELSE && luaX_lookahead(ls) == TK_IF) {
+    testnext(ls, TK_ELSE);
+    test_then_block(ls, &escapelist);  /* [ELSE] IF cond THEN block */
+  }
   if (testnext(ls, TK_ELSE)) {
     checknext(ls, OPEN_BRACE);
     block(ls);  /* 'else' part */
