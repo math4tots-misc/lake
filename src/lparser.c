@@ -1291,7 +1291,7 @@ static void forbody (LexState *ls, int base, int line, int nvars, int isnum) {
   FuncState *fs = ls->fs;
   int prep, endfor;
   adjustlocalvars(ls, 3);  /* control variables */
-  checknext(ls, TK_DO);
+  checknext(ls, OPEN_BRACE);
   prep = isnum ? luaK_codeAsBx(fs, OP_FORPREP, base, NO_JUMP) : luaK_jump(fs);
   enterblock(fs, &bl, 0);  /* scope for declared variables */
   adjustlocalvars(ls, nvars);
@@ -1308,6 +1308,7 @@ static void forbody (LexState *ls, int base, int line, int nvars, int isnum) {
   }
   luaK_patchlist(fs, endfor, prep + 1);
   luaK_fixline(fs, line);
+  check_match(ls, CLOSE_BRACE, OPEN_BRACE, line);
 }
 
 
@@ -1371,7 +1372,6 @@ static void forstat (LexState *ls, int line) {
     case ',': case TK_IN: forlist(ls, varname); break;
     default: luaX_syntaxerror(ls, "'=' or 'in' expected");
   }
-  check_match(ls, TK_END, TK_FOR, line);
   leaveblock(fs);  /* loop scope ('break' jumps to this point) */
 }
 

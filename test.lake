@@ -19,15 +19,15 @@ assert(i == 20)
 
 -- numeric for loop
 var total = 0
-for i = 1, 10 do
+for i = 1, 10 {
   total = total + i
-end
+}
 assert(total == 55)
 
 -- generic loop
 var xs = {"abc", "def", "ghi"}
 var x = ""
-for k, v in ipairs(xs) do
+for k, v in ipairs(xs) {
   x = x .. k .. v
-end
+}
 assert(x == "1abc2def3ghi")
