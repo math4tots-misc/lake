@@ -793,7 +793,7 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line) {
   checknext(ls, ')');
   statlist(ls);
   new_fs.f->lastlinedefined = ls->linenumber;
-  check_match(ls, TK_END, TK_FUNCTION, line);
+  check_match(ls, TK_END, TK_DEF, line);
   codeclosure(ls, e);
   close_func(ls);
 }
@@ -968,7 +968,7 @@ static void simpleexp (LexState *ls, expdesc *v) {
       constructor(ls, v);
       return;
     }
-    case TK_FUNCTION: {
+    case TK_DEF: {
       luaX_next(ls);
       body(ls, v, 0, ls->linenumber);
       return;
@@ -1566,13 +1566,13 @@ static void statement (LexState *ls) {
       repeatstat(ls, line);
       break;
     }
-    case TK_FUNCTION: {  /* stat -> funcstat */
+    case TK_DEF: {  /* stat -> funcstat */
       funcstat(ls, line);
       break;
     }
-    case TK_LOCAL: {  /* stat -> localstat */
+    case TK_VAR: {  /* stat -> localstat */
       luaX_next(ls);  /* skip LOCAL */
-      if (testnext(ls, TK_FUNCTION))  /* local function? */
+      if (testnext(ls, TK_DEF))  /* local function? */
         localfunc(ls);
       else
         localstat(ls);
