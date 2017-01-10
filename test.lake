@@ -8,7 +8,6 @@ assert(f() == 10)
 -- 'var'
 var a = 5
 assert(a == 5)
-print(a)
 
 -- while loop
 var i = 10
@@ -25,9 +24,14 @@ for i = 1, 10 {
 assert(total == 55)
 
 -- generic loop
-var xs = {"abc", "def", "ghi"}
+var xs = ["abc", "def", "ghi"]
 var x = ""
 for k, v in ipairs(xs) {
   x = x .. k .. v
 }
 assert(x == "1abc2def3ghi")
+
+-- tables with value index
+xs = [a = 5, *["hello " .. "world"] = 17]
+assert(xs['a'] == 5)
+assert(xs["hello world"] == 17)

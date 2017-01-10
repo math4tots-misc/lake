@@ -710,7 +710,8 @@ static void field (LexState *ls, struct ConsControl *cc) {
         recfield(ls, cc);
       break;
     }
-    case '[': {
+    case '*': {
+      luaX_next(ls);  /* skip the '*' */
       recfield(ls, cc);
       break;
     }
@@ -723,7 +724,7 @@ static void field (LexState *ls, struct ConsControl *cc) {
 
 
 static void constructor (LexState *ls, expdesc *t) {
-  /* constructor -> '{' [ field { sep field } [sep] ] '}'
+  /* constructor -> '[' [ field { sep field } [sep] ] ']'
      sep -> ',' | ';' */
   FuncState *fs = ls->fs;
   int line = ls->linenumber;
@@ -734,14 +735,14 @@ static void constructor (LexState *ls, expdesc *t) {
   init_exp(t, VRELOCABLE, pc);
   init_exp(&cc.v, VVOID, 0);  /* no value (yet) */
   luaK_exp2nextreg(ls->fs, t);  /* fix it at stack top */
-  checknext(ls, '{');
+  checknext(ls, '[');
   do {
     lua_assert(cc.v.k == VVOID || cc.tostore > 0);
-    if (ls->t.token == '}') break;
+    if (ls->t.token == ']') break;
     closelistfield(fs, &cc);
     field(ls, &cc);
   } while (testnext(ls, ',') || testnext(ls, ';'));
-  check_match(ls, '}', '{', line);
+  check_match(ls, ']', '[', line);
   lastlistfield(fs, &cc);
   SETARG_B(fs->f->code[pc], luaO_int2fb(cc.na)); /* set initial array size */
   SETARG_C(fs->f->code[pc], luaO_int2fb(cc.nh));  /* set initial table size */
@@ -959,7 +960,7 @@ static void simpleexp (LexState *ls, expdesc *v) {
       init_exp(v, VVARARG, luaK_codeABC(fs, OP_VARARG, 0, 1, 0));
       break;
     }
-    case '{': {  /* constructor */
+    case '[': {  /* constructor */
       constructor(ls, v);
       return;
     }
