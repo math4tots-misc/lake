@@ -8,3 +8,10 @@ var a = 5;
 
 assert(a == 5)
 print(a)
+
+var i = 10
+while i < 20 {
+  i = i + 1
+}
+assert(i == 20)
+print(i)
