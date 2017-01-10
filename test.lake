@@ -1,6 +1,6 @@
-def f()
+def f() {
   print("Hello world!")
-end
+}
 
 f();
 
