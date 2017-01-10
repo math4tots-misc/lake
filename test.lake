@@ -37,6 +37,7 @@ assert(xs['a'] == 5)
 assert(xs["hello world"] == 17)
 
 -- 'not equals' operator
+-- In Lua, '~=' is the not equals operator.
 -- But C-based languages usually use '!='
 assert(1 != 2)
 assert(not (1 != 1))
