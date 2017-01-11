@@ -30,6 +30,10 @@
 
 #define OPEN_BRACE '{'
 #define CLOSE_BRACE '}'
+#define OPEN_PAREN '('
+#define CLOSE_PAREN ')'
+#define OPEN_BRACKET '['
+#define CLOSE_BRACKE ']'
 
 
 /* maximum number of local variables per function (must be smaller
@@ -64,6 +68,12 @@ typedef struct BlockCnt {
 */
 static void statement (LexState *ls);
 static void expr (LexState *ls, expdesc *v);
+
+
+/*
+** prototypes for other functions that needed to be forward declared
+*/
+static void retstat (LexState *ls);
 
 
 /* semantic error */
@@ -804,6 +814,56 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line) {
 }
 
 
+static void lparlist (LexState *ls) {
+  /* lparlist -> [ param { param } ] */
+  FuncState *fs = ls->fs;
+  Proto *f = fs->f;
+  int nparams = 0;
+  f->is_vararg = 0;
+  if (ls->t.token != TK_RIGHT) {  /* is 'parlist' not empty? */
+    do {
+      switch (ls->t.token) {
+        case TK_NAME: {  /* param -> NAME */
+          new_localvar(ls, str_checkname(ls));
+          nparams++;
+          break;
+        }
+        case TK_DOTS: {  /* param -> '...' */
+          luaX_next(ls);
+          f->is_vararg = 2;  /* declared vararg */
+          break;
+        }
+        default: luaX_syntaxerror(ls, "<name> or '...' expected");
+      }
+    } while (!f->is_vararg && ls->t.token != TK_RIGHT);
+  }
+  adjustlocalvars(ls, nparams);
+  f->numparams = cast_byte(fs->nactvar);
+  luaK_reserveregs(fs, fs->nactvar);  /* reserve register for parameters */
+}
+
+
+static void lbody (LexState *ls, expdesc *e, int ismethod, int line) {
+  /* lbody ->  parlist '->' { block } */
+  /* lambda body */
+  FuncState new_fs;
+  BlockCnt bl;
+  new_fs.f = addprototype(ls);
+  new_fs.f->linedefined = line;
+  open_func(ls, &new_fs, &bl);
+  if (ismethod) {
+    new_localvarliteral(ls, "self");  /* create 'self' parameter */
+    adjustlocalvars(ls, 1);
+  }
+  lparlist(ls);
+  checknext(ls, TK_RIGHT);
+  retstat(ls);
+  new_fs.f->lastlinedefined = ls->linenumber;
+  codeclosure(ls, e);
+  close_func(ls);
+}
+
+
 static int explist (LexState *ls, expdesc *v) {
   /* explist -> expr { ',' expr } */
   int n = 1;  /* at least one expression */
@@ -962,6 +1022,11 @@ static void simpleexp (LexState *ls, expdesc *v) {
     }
     case '[': {  /* constructor */
       constructor(ls, v);
+      return;
+    }
+    case '\\': {
+      luaX_next(ls);
+      lbody(ls, v, 0, ls->linenumber);
       return;
     }
     case TK_DEF: {

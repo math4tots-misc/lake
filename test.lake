@@ -67,3 +67,8 @@ if false {
 } else {
   assert(true)
 }
+
+-- lambda functions
+var f = \ a -> a + 1
+assert(f(10) == 11)
+
