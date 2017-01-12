@@ -1,0 +1,4 @@
+require 'math'
+
+assert(cos() ** 2)
+assert(math.abs(-7) == 7)

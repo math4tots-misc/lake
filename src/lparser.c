@@ -893,6 +893,11 @@ static void funcargs (LexState *ls, expdesc *f, int line) {
       check_match(ls, ')', '(', line);
       break;
     }
+    case TK_STRING: {  /* funcargs -> STRING */
+      codestring(ls, &args, ls->t.seminfo.ts);
+      luaX_next(ls);  /* must use 'seminfo' before 'next' */
+      break;
+    }
     default: {
       luaX_syntaxerror(ls, "function arguments expected");
     }
@@ -971,7 +976,7 @@ static void suffixedexp (LexState *ls, expdesc *v) {
         funcargs(ls, v, line);
         break;
       }
-      case '(': {  /* funcargs */
+      case '(': case TK_STRING: {  /* funcargs */
         luaK_exp2nextreg(fs, v);
         funcargs(ls, v, line);
         break;
